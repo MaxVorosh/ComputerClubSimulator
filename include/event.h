@@ -5,6 +5,7 @@
 class Event {
 public:
     virtual std::string to_string() = 0;
+    virtual ~Event() = default;
 };
 
 class EventForceGone : public Event {
