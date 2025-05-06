@@ -36,7 +36,10 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
         return;
     }
     ClubLogger club(realStartTime, realEndTime, tablesN, cost);
-    parseEvents(fin, outLines, &club);
+    bool goodParsing = parseEvents(fin, outLines, &club);
+    if (!goodParsing) {
+        return;
+    }
     outLines.push_back(startTime);
     writeEvents(outLines, &club);
     outLines.push_back(endTime);
@@ -50,7 +53,7 @@ void Parser::writeError(std::vector<std::string>& outLines, std::string line, st
     outLines.push_back(message);
 }
 
-void Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines, ClubLogger* club) {
+bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines, ClubLogger* club) {
     std::string line;
     int lastTime = -1;
     while (std::getline(fin, line)) {
@@ -64,15 +67,15 @@ void Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
         }
         catch (...) {
             writeError(outLines, line, "Error in time format");
-            return;
+            return false;
         }
         if (realTime < lastTime) {
             writeError(outLines, line, "Not chronological order");
-            return;
+            return false;
         }
         if (type < 1 || type > 4) {
             writeError(outLines, line, "Incorrect type");
-            return;
+            return false;
         }
         IncomeEvent* ev;
         if (type == 1) {
@@ -84,7 +87,7 @@ void Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             table--;
             if (table < 0 || table > club->getProfit()->size()) {
                 writeError(outLines, line, "Incorrect table");
-                return;
+                return false;
             }
             ev = new EventSit(realTime, name, table);
         }
@@ -96,11 +99,12 @@ void Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
         }
         if (sStream.fail()) {
             writeError(outLines, line, "Parse fail");
-            return;
+            return false;
         }
         club->processEvent(ev);
     }
     club->close();
+    return true;
 }
 
 void Parser::writeEvents(std::vector<std::string>& outLines, ClubLogger* club) {
