@@ -186,3 +186,139 @@ TEST_CASE("ClubLogger test") {
     CHECK(logger.getProfit()->at(0).getIncome() == 20);
     CHECK(logger.getProfit()->at(0).getUseTime() == 4);
 }
+
+TEST_CASE("Parser test") {
+    Parser parser;
+    SUBCASE("Base test") {
+        std::string filename = "./../examples/base_example.txt";
+        std::vector<std::string> result = {
+            "09:00", "08:48 1 client1", "08:48 13 NotOpenYet", "09:41 1 client1", "09:48 1 client2",
+            "09:52 3 client1", "09:52 13 ICanWaitNoLonger!", "09:54 2 client1 1", "10:25 2 client2 2",
+            "10:58 1 client3", "10:59 2 client3 3", "11:30 1 client4", "11:35 2 client4 2",
+            "11:35 13 PlaceIsBusy", "11:45 3 client4", "12:33 4 client1", "12:33 12 client4 1",
+            "12:43 4 client2", "15:52 4 client4", "19:00 11 client3", "19:00", "1 70 05:58", "2 30 02:18", 
+            "3 90 08:01"
+        };
+        std::vector<std::string> out;
+        parser.parse(filename, out);
+        REQUIRE(out.size() == result.size());
+        for (int i = 0; i < out.size(); ++i) {
+            CHECK(out[i] == result[i]);
+        }
+    }
+
+    SUBCASE("Bad test") {
+        std::string filename = "./../examples/bad_example.txt";
+        std::vector<std::string> result = {"09:48 5 client1 1", "Incorrect type"};
+        std::vector<std::string> out;
+        parser.parse(filename, out);
+        REQUIRE(out.size() == result.size());
+        for (int i = 0; i < out.size(); ++i) {
+            CHECK(out[i] == result[i]);
+        }
+    }
+
+    SUBCASE("Long queue") {
+        std::string filename = "./../examples/long_queue.txt";
+        std::vector<std::string> result = {
+            "09:00",
+            "10:00 1 client1",
+            "10:01 1 client2",
+            "10:02 1 client3",
+            "10:03 1 client4",
+            "10:04 1 client5",
+            "10:05 1 client6",
+            "10:06 1 client7",
+            "10:07 1 client8",
+            "10:08 1 client9",
+            "10:09 1 client10",
+            "10:10 1 client11",
+            "10:11 1 client12",
+            "10:12 1 client13",
+            "10:13 1 client14",
+            "10:14 1 client15",
+            "10:15 1 client16",
+            "10:16 1 client17",
+            "10:17 1 client18",
+            "10:18 1 client19",
+            "10:19 1 client20",
+            "10:20 2 client1 1",
+            "10:21 2 client2 2",
+            "10:22 2 client3 3",
+            "10:23 2 client4 4",
+            "10:24 2 client5 5",
+            "10:25 2 client6 6",
+            "10:26 2 client7 7",
+            "10:27 2 client8 8",
+            "10:28 2 client9 9",
+            "10:29 2 client10 10",
+            "10:30 3 client11",
+            "10:31 3 client12",
+            "10:32 3 client13",
+            "10:33 3 client14",
+            "10:34 3 client15",
+            "10:35 3 client16",
+            "10:36 3 client17",
+            "10:37 3 client18",
+            "10:38 3 client19",
+            "10:39 3 client20",
+            "10:40 4 client1",
+            "10:40 12 client11 1",
+            "10:41 4 client2",
+            "10:41 12 client12 2",
+            "10:42 4 client3",
+            "10:42 12 client13 3",
+            "10:43 4 client4",
+            "10:43 12 client14 4",
+            "10:44 4 client5",
+            "10:44 12 client15 5",
+            "10:45 4 client6",
+            "10:45 12 client16 6",
+            "10:46 4 client7",
+            "10:46 12 client17 7",
+            "10:47 4 client8",
+            "10:47 12 client18 8",
+            "10:48 4 client9",
+            "10:48 12 client19 9",
+            "10:49 4 client10",
+            "10:49 12 client20 10",
+            "10:50 4 client11",
+            "10:51 4 client12",
+            "10:52 4 client13",
+            "10:53 4 client14",
+            "10:54 4 client15",
+            "10:55 4 client16",
+            "10:56 4 client17",
+            "10:57 4 client18",
+            "10:58 4 client19",
+            "10:59 4 client20",
+            "19:00",
+            "1 20 00:30",
+            "2 20 00:30",
+            "3 20 00:30",
+            "4 20 00:30",
+            "5 20 00:30",
+            "6 20 00:30",
+            "7 20 00:30",
+            "8 20 00:30",
+            "9 20 00:30",
+            "10 20 00:30"
+        };
+        std::vector<std::string> out;
+        parser.parse(filename, out);
+        REQUIRE(out.size() == result.size());
+        for (int i = 0; i < out.size(); ++i) {
+            CHECK(out[i] == result[i]);
+        }
+    }
+    SUBCASE("wrong parameters cnt") {
+        std::string filename = "./../examples/wrong_parameters_cnt.txt";
+        std::vector<std::string> result = {"08:48 1", "Parse fail"};
+        std::vector<std::string> out;
+        parser.parse(filename, out);
+        REQUIRE(out.size() == result.size());
+        for (int i = 0; i < out.size(); ++i) {
+            CHECK(out[i] == result[i]);
+        }
+    }
+}

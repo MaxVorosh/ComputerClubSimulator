@@ -68,3 +68,5 @@ Incorrect type
 ```
 ./ClubSimTest
 ```
+
+![alt text](images/test.png)
