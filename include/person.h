@@ -6,6 +6,7 @@ struct Person {
     int id;
     std::string name;
 
+    Person() = default;
     Person(int id, std::string name);
 };
 

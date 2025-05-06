@@ -4,19 +4,19 @@
 
 std::string EventForceGone::to_string() {
     std::stringstream sStream;
-    sStream << timeToStr(time) << ' ' << 1 << ' ' << name;
+    sStream << timeToStr(time) << ' ' << 11 << ' ' << name;
     return sStream.str();
 }
 
 std::string EventSitFromQueue::to_string() {
     std::stringstream sStream;
-    sStream << timeToStr(time) << ' ' << 2 << ' ' << name << ' ' << table;
+    sStream << timeToStr(time) << ' ' << 12 << ' ' << name << ' ' << table + 1;
     return sStream.str();
 }
 
 std::string EventError::to_string() {
     std::stringstream sStream;
-    sStream << timeToStr(time) << ' ' << 3 << ' ' << error;
+    sStream << timeToStr(time) << ' ' << 13 << ' ' << error;
     return sStream.str();
 }
 

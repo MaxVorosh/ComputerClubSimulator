@@ -26,7 +26,7 @@ std::string EventCome::to_string() {
 
 std::string EventSit::to_string() {
     std::stringstream sStream;
-    sStream << timeToStr(time) << ' ' << 2 << ' ' << name << ' ' << table;
+    sStream << timeToStr(time) << ' ' << 2 << ' ' << name << ' ' << table + 1;
     return sStream.str();
 }
 

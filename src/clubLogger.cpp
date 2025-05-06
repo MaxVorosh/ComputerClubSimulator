@@ -9,5 +9,18 @@ ClubLogger::~ClubLogger() {
 }
 
 void ClubLogger::processEvent(IncomeEvent* ev) {
+    club->addEvent(ev);
     ev->visit(club);
+}
+
+void ClubLogger::close() {
+    club->close();
+}
+
+std::vector<Table>* ClubLogger::getProfit() {
+    return club->getProfit();
+}
+
+std::vector<Event*>* ClubLogger::getEvents() {
+    return club->getEvents();
 }

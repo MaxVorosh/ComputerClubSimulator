@@ -113,3 +113,11 @@ void Club::close() {
         tables[table].release(endTime);
     }
 }
+
+std::vector<Table>* Club::getProfit() {
+    return &tables;
+}
+
+std::vector<Event*>* Club::getEvents() {
+    return &events;
+}

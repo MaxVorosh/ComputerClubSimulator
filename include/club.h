@@ -19,6 +19,9 @@ public:
     void dropClient(int time, std::string name);
     void addEvent(Event* event);
     void close();
+
+    std::vector<Table>* getProfit();
+    std::vector<Event*>* getEvents();
 private:
     std::vector<Table> tables;
     std::map<Person, int> busy_tables;
