@@ -83,6 +83,7 @@ void Club::dropClient(int time, std::string name) {
     }
     int id = guestsIds[name];
     Person client(id, name);
+    guestsIds.erase(name);
     if (busy_tables.find(client) != busy_tables.end()) {
         int table = busy_tables[client];
         tables[table].release(time);
@@ -97,7 +98,6 @@ void Club::dropClient(int time, std::string name) {
         return;
     }
     line.pop(client);
-    guestsIds.erase(name);
 }
 
 void Club::addEvent(Event* event) {
