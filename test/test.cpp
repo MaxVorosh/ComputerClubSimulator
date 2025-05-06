@@ -138,3 +138,51 @@ TEST_CASE("Club wait person test") {
     club.dropClient(21, "11");
     CHECK(club.getEvents()->size() == 4);
 }
+
+TEST_CASE("Club close test") {
+    Club club(10, 144, 2, 10);
+    club.addClient(11, "11");
+    club.moveClient(140, "11", 0);
+    club.close();
+    CHECK(club.getProfit()->at(0).getIncome() == 10);
+    CHECK(club.getProfit()->at(1).getIncome() == 0);
+    CHECK(club.getProfit()->at(0).getUseTime() == 4);
+    CHECK(club.getProfit()->at(1).getUseTime() == 0);
+}
+
+TEST_CASE("Client queue test") {
+    ClientQueue q;
+    Person one(1, "1");
+    Person two(2, "2");
+    Person three(3, "3");
+    CHECK(!q.in(one));
+    q.push(one);
+    CHECK(q.in(one));
+    Person same_name(2, "1");
+    CHECK(!q.in(same_name));
+    q.push(two);
+    q.push(two);
+    CHECK(q.size() == 2);
+    q.push(three);
+    q.pop(two);
+    CHECK(q.popLeft().name == one.name);
+    CHECK(q.popLeft().name == three.name);
+    CHECK(q.size() == 0);
+}
+
+TEST_CASE("ClubLogger test") {
+    ClubLogger logger(1, 10, 1, 10);
+    EventCome* evc = new EventCome(1, "1");
+    EventSit* evs = new EventSit(2, "1", 0);
+    EventCome* evc2 = new EventCome(3, "3");
+    EventWait* evw = new EventWait(4, "3");
+    EventGone* evg = new EventGone(5, "1");
+    EventGone* evg2 = new EventGone(6, "3");
+    std::vector<IncomeEvent*> events = {evc, evs, evc2, evw, evg, evg2};
+    for (auto ev: events) {
+        logger.processEvent(ev);
+    }
+    CHECK(logger.getEvents()->size() == 7);
+    CHECK(logger.getProfit()->at(0).getIncome() == 20);
+    CHECK(logger.getProfit()->at(0).getUseTime() == 4);
+}
