@@ -209,7 +209,7 @@ TEST_CASE("Parser test") {
 
     SUBCASE("Bad test") {
         std::string filename = "./../examples/bad_example.txt";
-        std::vector<std::string> result = {"09:48 5 client1 1", "Incorrect type"};
+        std::vector<std::string> result = {"09:48 5 client1 1"};
         std::vector<std::string> out;
         parser.parse(filename, out);
         REQUIRE(out.size() == result.size());
@@ -313,7 +313,7 @@ TEST_CASE("Parser test") {
     }
     SUBCASE("wrong parameters cnt") {
         std::string filename = "./../examples/wrong_parameters_cnt.txt";
-        std::vector<std::string> result = {"08:48 1", "Parse fail"};
+        std::vector<std::string> result = {"08:48 1"};
         std::vector<std::string> out;
         parser.parse(filename, out);
         REQUIRE(out.size() == result.size());

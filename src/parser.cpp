@@ -13,7 +13,7 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
     std::getline(fin, line);
     int tablesN = std::atoi(line.c_str());
     if (tablesN <= 0) {
-        writeError(outLines, line, "Error in number of tables");
+        writeError(outLines, line);
         return;
     }
     std::getline(fin, line);
@@ -26,13 +26,13 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
         realEndTime = strToTime(endTime);
     }
     catch (...) {
-        writeError(outLines, line, "Error in time format");
+        writeError(outLines, line);
         return;
     }
     std::getline(fin, line);
     int cost = std::atoi(line.c_str());
     if (cost <= 0) {
-        writeError(outLines, line, "Error in cost");
+        writeError(outLines, line);
         return;
     }
     ClubLogger club(realStartTime, realEndTime, tablesN, cost);
@@ -47,10 +47,9 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
     fin.close();
 }
 
-void Parser::writeError(std::vector<std::string>& outLines, std::string line, std::string message) {
+void Parser::writeError(std::vector<std::string>& outLines, std::string line) {
     outLines.clear();
     outLines.push_back(line);
-    outLines.push_back(message);
 }
 
 bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines, ClubLogger* club) {
@@ -66,15 +65,15 @@ bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             realTime = strToTime(time);
         }
         catch (...) {
-            writeError(outLines, line, "Error in time format");
+            writeError(outLines, line);
             return false;
         }
         if (realTime < lastTime) {
-            writeError(outLines, line, "Not chronological order");
+            writeError(outLines, line);
             return false;
         }
         if (type < 1 || type > 4) {
-            writeError(outLines, line, "Incorrect type");
+            writeError(outLines, line);
             return false;
         }
         IncomeEvent* ev;
@@ -86,7 +85,7 @@ bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             sStream >> table;
             table--;
             if (table < 0 || table > club->getProfit()->size()) {
-                writeError(outLines, line, "Incorrect table");
+                writeError(outLines, line);
                 return false;
             }
             ev = new EventSit(realTime, name, table);
@@ -98,7 +97,7 @@ bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             ev = new EventGone(realTime, name);
         }
         if (sStream.fail()) {
-            writeError(outLines, line, "Parse fail");
+            writeError(outLines, line);
             return false;
         }
         club->processEvent(ev);
