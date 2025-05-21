@@ -108,9 +108,11 @@ void Club::close() {
     for (auto p: busy_tables) {
         Person client = p.first;
         int table = p.second;
-        EventForceGone* ev = new EventForceGone(endTime, client.name);
-        addEvent(ev);
         tables[table].release(endTime);
+    }
+    for (auto name_id : guestsIds) {
+        EventForceGone* ev = new EventForceGone(endTime, name_id.first);
+        addEvent(ev);
     }
 }
 

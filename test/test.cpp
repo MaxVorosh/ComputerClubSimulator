@@ -5,7 +5,7 @@
 #include "timeConvertion.h"
 
 #include <vector>
-
+#include <iostream>
 
 TEST_CASE("TimeConvertion test") {
     std::vector<std::string> correct = {"00:00", "16:37", "04:20", "23:59"};
@@ -314,6 +314,27 @@ TEST_CASE("Parser test") {
     SUBCASE("wrong parameters cnt") {
         std::string filename = "./../examples/wrong_parameters_cnt.txt";
         std::vector<std::string> result = {"08:48 1"};
+        std::vector<std::string> out;
+        parser.parse(filename, out);
+        REQUIRE(out.size() == result.size());
+        for (int i = 0; i < out.size(); ++i) {
+            CHECK(out[i] == result[i]);
+        }
+    }
+
+    SUBCASE("Force gone everyone") {
+        std::string filename = "./../examples/force_gone_all_example.txt";
+        std::vector<std::string> result = {"09:00", "09:00 1 client1", "09:01 1 client2", "09:02 1 client3",
+            "09:03 1 client4", "09:04 1 client5", "09:05 2 client1 1", "09:06 2 client2 2", "09:07 2 client3 3",
+            "09:08 2 client4 4", "09:09 2 client5 5", "09:10 1 client6", "09:11 1 client7", "09:12 1 client8",
+            "09:13 1 client9", "09:14 1 client10", "09:15 3 client6", "09:16 3 client7", "09:17 3 client8",
+            "09:18 3 client9", "09:19 3 client10", "09:20 1 client11", "09:21 1 client12", "09:22 1 client13",
+            "09:23 1 client14", "09:24 1 client15", "12:00 11 client1", "12:00 11 client10", "12:00 11 client11",
+            "12:00 11 client12", "12:00 11 client13", "12:00 11 client14", "12:00 11 client15",
+            "12:00 11 client2", "12:00 11 client3", "12:00 11 client4", "12:00 11 client5", "12:00 11 client6",
+            "12:00 11 client7", "12:00 11 client8", "12:00 11 client9", "12:00", "1 3 02:55", "2 3 02:54",
+            "3 3 02:53", "4 3 02:52", "5 3 02:51"
+        };
         std::vector<std::string> out;
         parser.parse(filename, out);
         REQUIRE(out.size() == result.size());
