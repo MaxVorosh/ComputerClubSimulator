@@ -9,6 +9,8 @@ class Parser {
 public:
     Parser() = default;
     void parse(std::string filename, std::vector<std::string>& outLines);
+    bool checkDecimal(const std::string& number);
+    bool checkName(const std::string& name);
 private:
     bool parseEvents(std::ifstream& fin, std::vector<std::string>& outLines, ClubLogger* club);
     void writeEvents(std::vector<std::string>& outLines, ClubLogger* club);

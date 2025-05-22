@@ -187,6 +187,30 @@ TEST_CASE("ClubLogger test") {
     CHECK(logger.getProfit()->at(0).getUseTime() == 4);
 }
 
+TEST_CASE("Parser number validator test") {
+    Parser parser;
+    std::string goodNumbers[] = {"42", "-017"};
+    std::string badNumbers[] = {"0x2A", "3.1459", "1 one", "-19-1"};
+    for (int i = 0; i < 2; ++i) {
+        CHECK(parser.checkDecimal(goodNumbers[i]));
+    }
+    for (int i = 0; i < 4; ++i) {
+        CHECK(!parser.checkDecimal(badNumbers[i]));
+    }
+}
+
+TEST_CASE("Parser name validator test") {
+    Parser parser;
+    std::string goodNames[] = {"max", "many-separators_in_1-name"};
+    std::string badNames[] = {"john doe", "Capital", "apostroph's", "иван"};
+    for (int i = 0; i < 2; ++i) {
+        CHECK(parser.checkName(goodNames[i]));
+    }
+    for (int i = 0; i < 4; ++i) {
+        CHECK(!parser.checkName(badNames[i]));
+    }
+}
+
 TEST_CASE("Parser test") {
     Parser parser;
     SUBCASE("Base test") {
@@ -341,5 +365,98 @@ TEST_CASE("Parser test") {
         for (int i = 0; i < out.size(); ++i) {
             CHECK(out[i] == result[i]);
         }
+    }
+
+    SUBCASE("Invalid tables") {
+        std::string filenames[] = {"./../examples/bad_tables/letters.txt", "./../examples/bad_tables/mix.txt",
+             "./../examples/bad_tables/negative.txt", "./../examples/bad_tables/two_values.txt",
+              "./../examples/bad_tables/zero.txt"
+        };
+        std::vector<std::string> results = {"one", "11tables", "-12", "3 5", "0"};
+        for (int i = 0; i < 5; ++i) {
+            std::vector<std::string> out;
+            parser.parse(filenames[i], out);
+            REQUIRE(out.size() == 1);
+            CHECK(out[0] == results[i]);
+        }
+    }
+
+    SUBCASE("Invalid cost") {
+        std::string filenames[] = {"./../examples/bad_cost/letters.txt", "./../examples/bad_cost/mix.txt",
+             "./../examples/bad_cost/negative.txt", "./../examples/bad_cost/two_values.txt",
+              "./../examples/bad_cost/zero.txt"
+        };
+        std::vector<std::string> results = {"one", "11tables", "-12", "3 5", "0"};
+        for (int i = 0; i < results.size(); ++i) {
+            std::vector<std::string> out;
+            parser.parse(filenames[i], out);
+            REQUIRE(out.size() == 1);
+            CHECK(out[0] == results[i]);
+        }
+    }
+
+    SUBCASE("Invalid name") {
+        std::string filenames[] = {"./../examples/bad_names/capital.txt", "./../examples/bad_names/cyrillic.txt",
+            "./../examples/bad_names/star.txt", "./../examples/bad_names/two_values.txt",
+       };
+       std::vector<std::string> results = {"12:00 2 Capital 1", "12:00 3 иван", "12:00 1 regexp*", "12:00 4 john doe"};
+       for (int i = 0; i < results.size(); ++i) {
+           std::vector<std::string> out;
+           parser.parse(filenames[i], out);
+           REQUIRE(out.size() == 1);
+           CHECK(out[0] == results[i]);
+       }
+    }
+
+    SUBCASE("Invalid event") {
+        std::string filenames[] = {"./../examples/bad_event/bad_time.txt", "./../examples/bad_event/big_table.txt",
+            "./../examples/bad_event/big_type.txt", "./../examples/bad_event/negative_table.txt",
+            "./../examples/bad_event/negative_type.txt", "./../examples/bad_event/zero_table.txt",
+            "./../examples/bad_event/zero_type.txt"
+       };
+       std::vector<std::string> results = {"9:35 1 client1", "09:36 2 client1 2", "09:35 11 client1",
+            "09:36 2 client1 -1", "09:35 -1 client1", "09:36 2 client1 0", "09:35 0 client1"
+        };
+       for (int i = 0; i < results.size(); ++i) {
+           std::vector<std::string> out;
+           parser.parse(filenames[i], out);
+           REQUIRE(out.size() == 1);
+           CHECK(out[0] == results[i]);
+       }
+    }
+
+    SUBCASE("Invalid format") {
+        std::string filenames[] = {"./../examples/bad_format/little_args_1.txt",
+            "./../examples/bad_format/little_args_2.txt", "./../examples/bad_format/little_args_3.txt",
+            "./../examples/bad_format/little_args_4.txt", "./../examples/bad_format/many_args_1.txt",
+            "./../examples/bad_format/many_args_2.txt", "./../examples/bad_format/many_args_3.txt",
+            "./../examples/bad_format/one_time.txt", "./../examples/bad_format/swap_time.txt"
+       };
+       std::vector<std::string> results = {"12:30 1", "12:30 2 client1", "3 client1", "4",
+         "12:30 1 client1 smth", "12:30 2 client1 1 12", "12:30 3 client1 12", "12:00", "12:29 1 client2"
+        };
+       for (int i = 0; i < results.size(); ++i) {
+           std::vector<std::string> out;
+           parser.parse(filenames[i], out);
+           REQUIRE(out.size() == 1);
+           CHECK(out[0] == results[i]);
+       }
+    }
+
+    SUBCASE("Invalid values") {
+        std::string filenames[] = {"./../examples/bad_values/header_time.txt",
+            "./../examples/bad_values/swap_header_time.txt", "./../examples/bad_values/table.txt",
+            "./../examples/bad_values/three_time_header.txt", "./../examples/bad_values/time.txt",
+            "./../examples/bad_values/type.txt"
+       };
+       std::vector<std::string> results = {"12:00 thirteen", "13:00 12:00", "12:30 2 client1 table", 
+         "12:00 13:00 14:00", "time 1 client1", "12:30 one client1"
+        };
+       for (int i = 0; i < results.size(); ++i) {
+           std::vector<std::string> out;
+           parser.parse(filenames[i], out);
+           REQUIRE(out.size() == 1);
+           CHECK(out[0] == results[i]);
+       }
     }
 }

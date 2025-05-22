@@ -12,7 +12,7 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
     std::string line;
     std::getline(fin, line);
     int tablesN = std::atoi(line.c_str());
-    if (tablesN <= 0) {
+    if (tablesN <= 0 || !checkDecimal(line)) {
         writeError(outLines, line);
         return;
     }
@@ -24,6 +24,12 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
     try {
         realStartTime = strToTime(startTime);
         realEndTime = strToTime(endTime);
+        std::string remains;
+        sStream >> remains;
+        if (realStartTime > realEndTime || remains.size() > 0) {
+            writeError(outLines, line);
+            return;
+        }
     }
     catch (...) {
         writeError(outLines, line);
@@ -31,7 +37,7 @@ void Parser::parse(std::string filename, std::vector<std::string>& outLines) {
     }
     std::getline(fin, line);
     int cost = std::atoi(line.c_str());
-    if (cost <= 0) {
+    if (cost <= 0 || !checkDecimal(line)) {
         writeError(outLines, line);
         return;
     }
@@ -68,14 +74,11 @@ bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             writeError(outLines, line);
             return false;
         }
-        if (realTime < lastTime) {
+        if (realTime < lastTime || type < 1 || type > 4 || !checkName(name)) {
             writeError(outLines, line);
             return false;
         }
-        if (type < 1 || type > 4) {
-            writeError(outLines, line);
-            return false;
-        }
+        lastTime = realTime;
         IncomeEvent* ev;
         if (type == 1) {
             ev = new EventCome(realTime, name);
@@ -84,7 +87,7 @@ bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             int table;
             sStream >> table;
             table--;
-            if (table < 0 || table > club->getProfit()->size()) {
+            if (table < 0 || table >= club->getProfit()->size()) {
                 writeError(outLines, line);
                 return false;
             }
@@ -97,6 +100,12 @@ bool Parser::parseEvents(std::ifstream& fin, std::vector<std::string>& outLines,
             ev = new EventGone(realTime, name);
         }
         if (sStream.fail()) {
+            writeError(outLines, line);
+            return false;
+        }
+        std::string remains;
+        sStream >> remains;
+        if (remains.size() > 0) {
             writeError(outLines, line);
             return false;
         }
@@ -119,4 +128,26 @@ void Parser::writeProfit(std::vector<std::string>& outLines, ClubLogger* club) {
         sStream << i + 1 << ' ' << tables->at(i).getIncome() << ' ' << timeToStr(tables->at(i).getUseTime());
         outLines.push_back(sStream.str());
     }
+}
+
+bool Parser::checkDecimal(const std::string& number) {
+    int i = 0;
+    if (number.size() > 0 && number[i] == '-') {
+        i++;
+    }
+    for (; i < number.size(); ++i) {
+        if ('0' > number[i] || number[i] > '9') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Parser::checkName(const std::string& name) {
+    for (int i = 0; i < name.size(); ++i) {
+        if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0' && name[i] <= '9') || name[i] == '_' || name[i] == '-')) {
+            return false;
+        }
+    }
+    return true;
 }
